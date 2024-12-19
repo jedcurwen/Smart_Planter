@@ -43,6 +43,7 @@ public class WaterPlants extends AppCompatActivity {
             TextView connIP = findViewById(R.id.connTV2);
             connIP.setText(D1IP);
 
+
             Button water = (Button) findViewById(R.id.waterBtn);
             water.setOnClickListener(new View.OnClickListener() {
                 @Override

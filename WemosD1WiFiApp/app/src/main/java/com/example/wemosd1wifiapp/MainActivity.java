@@ -79,6 +79,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button checkBattery = (Button) findViewById(R.id.checkBattery);
+        checkBattery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CheckBatteryLevel();
+            }
+        });
+
 
 
         // Set up the button click listener
@@ -112,6 +120,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             }).start();
         });
+
+    }
+
+    private void CheckBatteryLevel() {
+        Log.d("CheckBattery", "Check Battery Button Pressed!!!");
+        Log.d("D1IP", D1IP);
+
 
     }
 
@@ -226,8 +241,15 @@ public class MainActivity extends AppCompatActivity {
 
                         // Handle the response
                         runOnUiThread(() -> {
+
+
                             Log.d("SEND TO D1", "Response received: " + response.toString().trim());
+
+                            D1IP = response.toString().trim();
                             Toast.makeText(MainActivity.this, "Response: " + response.toString().trim(), Toast.LENGTH_LONG).show();
+                            Log.d("D1IPAddress", "IP ASSIGNED: " + D1IP);
+
+
                         });
 
                     } catch (IOException e) {

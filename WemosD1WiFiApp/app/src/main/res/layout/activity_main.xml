@@ -46,19 +46,44 @@
 
     <Button
         android:id="@+id/waterView"
-        android:layout_width="59dp"
-        android:layout_height="61dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="80dp"
-        android:layout_marginEnd="232dp"
+        android:layout_width="57dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="87dp"
         android:layout_marginBottom="24dp"
-        android:enabled="false"
         android:background="@drawable/baseline_water_drop_24"
+        android:enabled="false"
+        app:layout_constraintBottom_toTopOf="@+id/networksList"
+        app:layout_constraintStart_toEndOf="@+id/checkBattery"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/battLevel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="259dp"
+        android:layout_marginTop="9dp"
+        android:layout_marginEnd="94dp"
+        android:layout_marginBottom="137dp"
+        android:text="Hello World!"
         app:layout_constraintBottom_toTopOf="@+id/networksList"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/wifiBtn"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/checkBattery"
+        android:layout_width="60dp"
+        android:layout_height="57dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="84dp"
+        android:layout_marginBottom="16dp"
+        android:text="Button"
+        app:icon="@drawable/baseline_battery_charging_full_24"
+        app:layout_constraintBottom_toTopOf="@+id/networksList"
+        app:layout_constraintStart_toEndOf="@+id/wifiBtn"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
