@@ -125,10 +125,73 @@ public class MainActivity extends AppCompatActivity {
 
     private void CheckBatteryLevel() {
         Log.d("CheckBattery", "Check Battery Button Pressed!!!");
-        Log.d("D1IP", D1IP);
 
+
+
+
+        Toast.makeText(MainActivity.this, "Check Battery Button Pressed!", Toast.LENGTH_SHORT).show();
+
+       TextView connTV = findViewById(R.id.connTV);
+       String wemosIP =  connTV.getText().toString();
+
+        new Thread(() -> {
+            HttpURLConnection connection = null;
+            try {
+                final String ip = D1IP;
+                Log.d("SEND TO D1", "Creating URL connection");
+                String url = "http://" + ip + "/batteryLevel"; // Send request to Wemos
+                URL urlObj = new URL(url);
+                connection = (HttpURLConnection) urlObj.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+
+
+                Log.d("SEND TO D1", "Reading response");
+                InputStream is = connection.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line).append("\n");
+                }
+                reader.close();
+
+                //get D1 localIP
+                String responseString = response.toString().trim();
+                String localIP = "";
+                if(responseString.contains("Local IP")){
+                    localIP = responseString.split("Local IP: ")[1].trim();
+                }
+                String finalIP = localIP;
+                runOnUiThread(()->{
+                    Toast.makeText(MainActivity.this, "D1 Local IP: " + finalIP, Toast.LENGTH_LONG).show();
+
+                });
+
+
+                // Handle the response
+                runOnUiThread(() -> {
+                    Log.d("SEND TO D1", "Response received: " + response.toString().trim());
+                    Toast.makeText(MainActivity.this, "Response: " + response.toString().trim(), Toast.LENGTH_LONG).show();
+                });
+
+            } catch (IOException e) {
+                Log.e("SEND TO D1", "IOException: " + e.getMessage(), e);
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+        }).start();
 
     }
+
+
+
+
+
 
 
     private void updateListView(String response) {
@@ -222,11 +285,12 @@ public class MainActivity extends AppCompatActivity {
                         }
                         String finalIP = localIP;
                         runOnUiThread(()->{
-                            Toast.makeText(MainActivity.this, "D1 Local IP: " + finalIP, Toast.LENGTH_LONG).show();
+
 
                             D1IP = finalIP;
-                            TextView connTv = findViewById(R.id.connTV);
-                            connTv.setText(D1IP);
+
+                            Toast.makeText(MainActivity.this, "D1 Local IP: " + D1IP, Toast.LENGTH_LONG).show();
+
 
                             Button waterButton = findViewById(R.id.waterView);
                             waterButton.setEnabled(true);
@@ -247,6 +311,11 @@ public class MainActivity extends AppCompatActivity {
 
                             D1IP = response.toString().trim();
                             Toast.makeText(MainActivity.this, "Response: " + response.toString().trim(), Toast.LENGTH_LONG).show();
+
+                            TextView connTv = findViewById(R.id.connTV);
+                            connTv.setText(D1IP);
+
+
                             Log.d("D1IPAddress", "IP ASSIGNED: " + D1IP);
 
 
