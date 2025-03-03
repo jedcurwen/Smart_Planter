@@ -33,9 +33,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,9 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
-
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -84,6 +84,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 CheckBatteryLevel();
+            }
+        });
+
+        Button waterLevel = (Button) findViewById(R.id.waterLvlBtn);
+        waterLevel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CheckWaterLevel();
             }
         });
 
@@ -123,23 +131,98 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void CheckWaterLevel(){
+        //Check the Water Level
+
+        Toast.makeText(MainActivity.this, "HI This is The IP: "+  D1IP, Toast.LENGTH_SHORT).show();
+
+        Log.d("Check Water Level", "Check Water Level button pressed");
+
+        Toast.makeText(MainActivity.this, "Check Water Level Button", Toast.LENGTH_SHORT).show();
+
+        TextView waterTV = findViewById(R.id.waterLevelTB);
+        TextView connTV = findViewById(R.id.connTV);
+        String wemosIP =  connTV.getText().toString();
+
+        new Thread(() -> {
+            HttpURLConnection connection = null;
+            try{
+
+                final String ip = D1IP;
+                Log.d("SEND TO D1", "Creating URL connection");
+                Log.d("Water Level IP", "IP: " + " " + wemosIP);
+                InetAddress address = InetAddress.getByName(ip);
+                String fixedIP = address.getHostAddress(); // Ensure it's an IPv4 address
+                String url = "http://" + fixedIP + "/waterLevel";
+                URL urlObj = new URL(url);
+
+                connection = (HttpURLConnection) urlObj.openConnection();
+
+                connection.setRequestMethod("GET");
+                connection.setDoOutput(false);
+                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+                Log.d("SEND TO D1", "Reading response");
+                InputStream is = connection.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line).append("\n");
+                }
+                reader.close();
+
+                //get D1 localIP
+                String responseString = response.toString().trim();
+                String localIP = "";
+                if(responseString.contains("Local IP")){
+                    localIP = responseString.split("Local IP: ")[1].trim();
+                }
+                String finalIP = localIP;
+                runOnUiThread(()->{
+                    Toast.makeText(MainActivity.this, "D1 Local IP: " + finalIP, Toast.LENGTH_LONG).show();
+
+                });
+                // Handle the response
+                runOnUiThread(() -> {
+                    Log.d("SEND TO D1", "Response received: " + response.toString().trim());
+
+                    waterTV.setText(responseString);
+                    Toast.makeText(MainActivity.this, "Response: " + response.toString().trim(), Toast.LENGTH_LONG).show();
+
+                });
+            } catch (IOException e){
+                Log.e("SEND TO D1", "IOException: " + e.getMessage(), e);
+            } finally{
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+
+
+
+            });
+
+        }
+
     private void CheckBatteryLevel() {
         Log.d("CheckBattery", "Check Battery Button Pressed!!!");
-
-
-
-
         Toast.makeText(MainActivity.this, "Check Battery Button Pressed!", Toast.LENGTH_SHORT).show();
 
        TextView connTV = findViewById(R.id.connTV);
        String wemosIP =  connTV.getText().toString();
+       D1IP = wemosIP; //update global variable
+       Log.d("CheckBattery", "Using D1IP: " + D1IP);
+       Log.d("CheckBattery", "Using D1IP: " + wemosIP);
+
 
         new Thread(() -> {
             HttpURLConnection connection = null;
             try {
-                final String ip = D1IP;
                 Log.d("SEND TO D1", "Creating URL connection");
-                String url = "http://" + ip + "/batteryLevel"; // Send request to Wemos
+                Log.d("Battery Level IP", "IP: " + " " + D1IP);
+
+                String url = "http://" + D1IP + "/batteryLevel"; // Send request to Wemos
                 URL urlObj = new URL(url);
                 connection = (HttpURLConnection) urlObj.openConnection();
                 connection.setRequestMethod("POST");
@@ -187,13 +270,6 @@ public class MainActivity extends AppCompatActivity {
         }).start();
 
     }
-
-
-
-
-
-
-
     private void updateListView(String response) {
         runOnUiThread(() -> {
             // Extract network names from the response
@@ -226,122 +302,99 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void promptForPasswordAndConnect(String ssid) {
-        // Create an AlertDialog to prompt the user for the password
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Connect to " + ssid);
 
-        // Set up the input
         final EditText input = new EditText(MainActivity.this);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         builder.setView(input);
 
-        // Set up the buttons
-        builder.setPositiveButton("Connect", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String password = input.getText().toString();
-                //SEND POST Signal To D1
+        builder.setPositiveButton("Connect", (dialog, which) -> {
+            String password = input.getText().toString();
 
-                new Thread(() -> {
-                    HttpURLConnection connection = null;
-                    try {
-                        Log.d("SEND TO D1", "Creating URL connection");
-                        String url = "http://192.168.4.1/connect"; // IP of the D1 Mini AP
-                        URL urlObj = new URL(url);
-                        connection = (HttpURLConnection) urlObj.openConnection();
-                        connection.setRequestMethod("POST");
-                        connection.setDoOutput(true);
-                        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            new Thread(() -> {
+                HttpURLConnection connection = null;
+                try {
+                    Log.d("SEND TO D1", "Creating URL connection");
+                    String url = "http://192.168.4.1/connect";
+                    URL urlObj = new URL(url);
+                    connection = (HttpURLConnection) urlObj.openConnection();
+                    connection.setRequestMethod("POST");
+                    connection.setDoOutput(true);
+                    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
-                        Uri.Builder builder = new Uri.Builder()
-                                .appendQueryParameter("ssid", ssid)
-                                .appendQueryParameter("password", password);
-                        String query = builder.build().getEncodedQuery();
+                    Uri.Builder uriBuilder = new Uri.Builder()
+                            .appendQueryParameter("ssid", ssid)
+                            .appendQueryParameter("password", password);
+                    String query = uriBuilder.build().getEncodedQuery();
 
-                        Log.d("SEND TO D1", "Sending data: " + query);
-                        OutputStream os = connection.getOutputStream();
-                        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                        writer.write(query);
-                        writer.flush();
-                        writer.close();
-                        os.close();
+                    Log.d("SEND TO D1", "Sending data: " + query);
+                    OutputStream os = connection.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                    writer.write(query);
+                    writer.flush();
+                    writer.close();
+                    os.close();
 
-
-                        Log.d("SEND TO D1", "Reading response");
-                        InputStream is = connection.getInputStream();
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                        StringBuilder response = new StringBuilder();
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            response.append(line).append("\n");
-                        }
-                        reader.close();
-
-                        //get D1 localIP
-                        String responseString = response.toString().trim();
-                        String localIP = "";
-                        if(responseString.contains("Local IP")){
-                            localIP = responseString.split("Local IP: ")[1].trim();
-                        }
-                        String finalIP = localIP;
-                        runOnUiThread(()->{
-
-
-                            D1IP = finalIP;
-
-                            Toast.makeText(MainActivity.this, "D1 Local IP: " + D1IP, Toast.LENGTH_LONG).show();
-
-
-                            Button waterButton = findViewById(R.id.waterView);
-                            waterButton.setEnabled(true);
-
-                            connectToMainWiFi();
-
-
-
-
-                        });
-
-
-                        // Handle the response
-                        runOnUiThread(() -> {
-
-
-                            Log.d("SEND TO D1", "Response received: " + response.toString().trim());
-
-                            D1IP = response.toString().trim();
-                            Toast.makeText(MainActivity.this, "Response: " + response.toString().trim(), Toast.LENGTH_LONG).show();
-
-                            TextView connTv = findViewById(R.id.connTV);
-                            connTv.setText(D1IP);
-
-
-                            Log.d("D1IPAddress", "IP ASSIGNED: " + D1IP);
-
-
-                        });
-
-                    } catch (IOException e) {
-                        Log.e("SEND TO D1", "IOException: " + e.getMessage(), e);
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to send data", Toast.LENGTH_SHORT).show());
-                    } finally {
-                        if (connection != null) {
-                            connection.disconnect();
-                        }
+                    Log.d("SEND TO D1", "Reading response");
+                    InputStream is = connection.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line).append("\n");
                     }
-                }).start();
+                    reader.close();
 
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
+                    // Process response
+                    String responseString = response.toString().trim();
+                    Log.d("SEND TO D1", "Full Response: " + responseString);
+
+                    String localIP = responseString.trim(); // Use the response directly
+
+                    if (!localIP.matches("\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b")) { // Validate it's an IP
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "Invalid IP received", Toast.LENGTH_LONG).show());
+                        return;
+                    }
+
+                    if (localIP.isEmpty()) {
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to retrieve D1 IP", Toast.LENGTH_LONG).show());
+                        return;
+                    }
+
+                    // Update UI with IP
+                    String finalIP = localIP;
+                    runOnUiThread(() -> {
+                        D1IP = finalIP;
+                        Toast.makeText(MainActivity.this, "D1 Local IP: " + D1IP, Toast.LENGTH_LONG).show();
+
+                        Button waterButton = findViewById(R.id.waterView);
+                        waterButton.setEnabled(true);
+
+                        TextView connTv = findViewById(R.id.connTV);
+                        connTv.setText(D1IP);
+
+                        Log.d("D1IPAddress", "IP ASSIGNED: " + D1IP);
+
+                        // Connect to main WiFi after setting D1IP
+                        connectToMainWiFi();
+                    });
+
+                } catch (IOException e) {
+                    Log.e("SEND TO D1", "IOException: " + e.getMessage(), e);
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to send data", Toast.LENGTH_SHORT).show());
+                } finally {
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
+                }
+            }).start();
         });
 
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
     }
+
 
     private void connectToMainWiFi() {
         // Get the current connected network
@@ -419,122 +472,3 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-
-
-/*                //networksList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    //public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        //String selectedNetwork = discoveredWifi.get(position);
-                        //promptForPasswordAndConnect(selectedNetwork);
-
-                //});
-                /*
-            private void promptForPasswordAndConnect(String ssid) {
-                // Create an AlertDialog to prompt the user for the password
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Connect to " + ssid);
-
-                // Set up the input
-                final EditText input = new EditText(MainActivity.this);
-                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                builder.setView(input);
-
-                // Set up the buttons
-                builder.setPositiveButton("Connect", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String password = input.getText().toString();
-                        connectToWifi(ssid, password);
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.show();
-            }
-        */
-                /*
-            private void connectToWifi(String ssid, String password) {
-                WifiConfiguration wifiConfig = new WifiConfiguration();
-                wifiConfig.SSID = String.format("\"%s\"", ssid);
-                wifiConfig.preSharedKey = String.format("\"%s\"", password);
-
-                // Add the configuration to the WifiManager
-                int netId = wifiManager.addNetwork(wifiConfig);
-                wifiManager.disconnect();
-                wifiManager.enableNetwork(netId, true);
-                wifiManager.reconnect();
-
-                // Optional: You can check the connection status or show a Toast message
-                Toast.makeText(MainActivity.this, "Connecting to " + ssid, Toast.LENGTH_SHORT).show();
-            }
-
-            private void scanFailure() {
-                Toast.makeText(MainActivity.this, "Scan failed! Please try again.", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        // Register the BroadcastReceiver
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        registerReceiver(wifiScanReceiver, intentFilter);
-*/
-
-/*
-public void sendWifiD1(String ssid, String password){
-        Log.d("SEND TO D1", "Sending Data to D1 - Start");
-        new Thread(() -> {
-            HttpURLConnection connection = null;
-            try {
-                Log.d("SEND TO D1", "Creating URL connection");
-                String url = "http://192.168.4.1/connect"; // IP of the D1 Mini AP
-                URL urlObj = new URL(url);
-                connection = (HttpURLConnection) urlObj.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setDoOutput(true);
-                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
-                Uri.Builder builder = new Uri.Builder()
-                        .appendQueryParameter("ssid", "123456789")
-                        .appendQueryParameter("password", "123456789");
-                String query = builder.build().getEncodedQuery();
-
-                Log.d("SEND TO D1", "Sending data: " + query);
-                OutputStream os = connection.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                writer.write(query);
-                writer.flush();
-                writer.close();
-                os.close();
-
-                Log.d("SEND TO D1", "Reading response");
-                InputStream is = connection.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line).append("\n");
-                }
-                reader.close();
-
-                // Handle the response
-                runOnUiThread(() -> {
-                    Log.d("SEND TO D1", "Response received: " + response.toString().trim());
-                    Toast.makeText(MainActivity.this, "Response: " + response.toString().trim(), Toast.LENGTH_LONG).show();
-                });
-
-            } catch (IOException e) {
-                Log.e("SEND TO D1", "IOException: " + e.getMessage(), e);
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to send data", Toast.LENGTH_SHORT).show());
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-            }
-        }).start();
-    }
- */

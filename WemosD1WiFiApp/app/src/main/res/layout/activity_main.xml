@@ -26,7 +26,7 @@
         android:id="@+id/wifiBtn"
         android:layout_width="57dp"
         android:layout_height="61dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="84dp"
         app:icon="@drawable/baseline_wifi_find_24"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="16dp" />
@@ -46,9 +46,9 @@
 
     <Button
         android:id="@+id/waterView"
-        android:layout_width="57dp"
-        android:layout_height="54dp"
-        android:layout_marginStart="13dp"
+        android:layout_width="54dp"
+        android:layout_height="62dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="87dp"
         android:layout_marginBottom="24dp"
         android:background="@drawable/baseline_water_drop_24"
@@ -61,20 +61,19 @@
         android:id="@+id/battLevel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="259dp"
-        android:layout_marginTop="9dp"
-        android:layout_marginEnd="94dp"
-        android:layout_marginBottom="137dp"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toTopOf="@+id/networksList"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="142dp"
+        android:layout_marginBottom="702dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/checkBattery"
-        android:layout_width="60dp"
-        android:layout_height="57dp"
+        android:layout_width="58dp"
+        android:layout_height="63dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="84dp"
         android:layout_marginBottom="16dp"
@@ -84,6 +83,59 @@
         app:layout_constraintStart_toEndOf="@+id/wifiBtn"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="240dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="147dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/imageView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/baseline_battery_charging_full_24" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="240dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="104dp"
+        app:layout_constraintBottom_toTopOf="@+id/networksList"
+        app:layout_constraintEnd_toStartOf="@+id/waterLevelTB"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:srcCompat="@drawable/baseline_water_drop_24" />
+
+    <TextView
+        android:id="@+id/waterLevelTB"
+        android:layout_width="65dp"
+        android:layout_height="21dp"
+        android:layout_marginTop="38dp"
+        android:layout_marginEnd="80dp"
+        android:layout_marginBottom="106dp"
+        app:layout_constraintBottom_toTopOf="@+id/networksList"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/waterLvlBtn"
+        android:layout_width="59dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="22dp"
+        android:text="W"
+        app:layout_constraintBottom_toTopOf="@+id/networksList"
+        app:layout_constraintStart_toEndOf="@+id/waterView"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
