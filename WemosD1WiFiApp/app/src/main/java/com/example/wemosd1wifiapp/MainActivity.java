@@ -198,12 +198,8 @@ public class MainActivity extends AppCompatActivity {
                     connection.disconnect();
                 }
             }
-
-
-
-            });
-
-        }
+        }).start();
+    }
 
     private void CheckBatteryLevel() {
         Log.d("CheckBattery", "Check Battery Button Pressed!!!");
@@ -213,20 +209,22 @@ public class MainActivity extends AppCompatActivity {
        String wemosIP =  connTV.getText().toString();
        D1IP = wemosIP; //update global variable
        Log.d("CheckBattery", "Using D1IP: " + D1IP);
-       Log.d("CheckBattery", "Using D1IP: " + wemosIP);
-
-
         new Thread(() -> {
             HttpURLConnection connection = null;
             try {
+                final String ip = D1IP;
                 Log.d("SEND TO D1", "Creating URL connection");
                 Log.d("Battery Level IP", "IP: " + " " + D1IP);
 
-                String url = "http://" + D1IP + "/batteryLevel"; // Send request to Wemos
+                Log.d("SEND TO D1", "Creating URL connection");
+                Log.d("BATTERY Level IP", "IP: " + " " + wemosIP);
+                InetAddress address = InetAddress.getByName(ip);
+                String fixedIP = address.getHostAddress(); // Ensure it's an IPv4 address
+                String url = "http://" + fixedIP + "/batteryLevel";
                 URL urlObj = new URL(url);
                 connection = (HttpURLConnection) urlObj.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setDoOutput(true);
+                connection.setRequestMethod("GET");
+                connection.setDoOutput(false);
                 connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
 
