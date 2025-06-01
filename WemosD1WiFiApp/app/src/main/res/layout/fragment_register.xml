@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegisterFragment">
+
+
+    <Button
+        android:id="@+id/registerBtn"
+        android:layout_width="211dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="79dp"
+        android:layout_marginEnd="121dp"
+        android:layout_marginBottom="48dp"
+        android:text="Register"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="318dp"
+        android:layout_height="445dp"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="176dp"
+        android:layout_marginEnd="22dp"
+        android:background="#FFEBEE"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.38"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="299dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="33dp"
+            android:layout_marginEnd="31dp"
+            android:layout_marginBottom="30dp"
+            android:hint="Enter Password"
+            android:ems="10"
+            android:inputType="textPassword"
+            app:layout_constraintBottom_toTopOf="@+id/email"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.557"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/username" />
+
+        <EditText
+            android:id="@+id/username"
+            android:layout_width="299dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="24dp"
+            android:hint="Enter Username"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="10dp"
+            android:ems="10"
+            android:inputType="text"
+            app:layout_constraintBottom_toTopOf="@+id/password"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.54"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/firstName" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="299dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="4dp"
+            android:ems="10"
+            android:inputType="text"
+            android:hint="Enter Email"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.48"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/password"
+            app:layout_constraintVertical_bias="0.764" />
+
+        <EditText
+            android:id="@+id/firstName"
+            android:layout_width="165dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="134dp"
+            android:layout_marginBottom="24dp"
+            android:ems="10"
+            android:inputType="text"
+            android:hint="Firstname"
+            app:layout_constraintBottom_toTopOf="@+id/username"
+            app:layout_constraintEnd_toStartOf="@+id/surname"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/surname"
+            android:layout_width="146dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="168dp"
+            android:layout_marginTop="134dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="24dp"
+            android:ems="10"
+            android:inputType="text"
+            android:hint="Surname"
+            app:layout_constraintBottom_toTopOf="@+id/username"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.151" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imageView3"
+            android:layout_width="77dp"
+            android:layout_height="63dp"
+            android:layout_marginStart="104dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="130dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/login_24dp_1f1f1f_fill0_wght400_grad0_opsz24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
